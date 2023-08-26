@@ -3,9 +3,10 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
 from .models import User
-
+from .forms import CreateListingForm
 
 def index(request):
     return render(request, "auctions/index.html")
@@ -61,3 +62,21 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+
+
+@login_required
+def create_listing(request):
+    if request.method == "POST":
+        form = CreateListingForm(request.POST, request.FILES)  # Note: request.FILES is needed if you're uploading files
+        if form.is_valid():
+            new_listing = form.save(commit=False)
+            new_listing.owner = request.user  # set the owner to the currently logged-in user
+            new_listing.current_price = new_listing.start_price  # set the current price to the starting price
+            new_listing.save()
+            return HttpResponseRedirect(reverse("index"))  # Redirect to homepage or to the new listing's page after creation
+    else:
+        form = CreateListingForm()
+
+    return render(request, "auctions/create_listing.html", {
+        "form": form
+    })

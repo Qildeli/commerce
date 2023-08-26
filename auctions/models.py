@@ -26,6 +26,7 @@ class Auction(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Active')
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="auctions_owned", on_delete=models.CASCADE) #Relation to User Model, indicating the user who posted the listing
     winner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="auctions_won", null=True, on_delete=models.SET_NULL) # Relation to User Model, indicating the user who won the auction; default is null until the auction ends
+    category = models.ForeignKey('Category', related_name="listings", null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.title
@@ -60,3 +61,10 @@ class Watchlist(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="watchlist_items", on_delete=models.CASCADE)
     listing = models.ForeignKey(Auction, related_name="watched_by", on_delete=models.CASCADE)
     added_on = models.DateTimeField(auto_now_add=True)
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
