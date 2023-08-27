@@ -1,7 +1,18 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
+from datetime import timedelta
+from django.utils import timezone
 from django.db import models
 from commerce import settings
+
+
+def validate_non_negative(value):
+    if value < 0:
+        raise ValidationError('Amount must be a non-negative value.')
+
+
+def default_end_date():
+    return timezone.now() + timedelta(days=7)
 
 
 class User(AbstractUser):
@@ -18,11 +29,11 @@ class Auction(models.Model):
 
     title = models.CharField(max_length=255)
     description = models.TextField()
-    start_price = models.DecimalField(max_digits=10, decimal_places=2)
+    start_price = models.DecimalField(max_digits=10, decimal_places=2, validators=[validate_non_negative])
     current_price = models.DecimalField(max_digits=10, decimal_places=2)
     image_url = models.ImageField(upload_to='auction_images/', blank=True, null=True)
     start_date = models.DateTimeField(auto_now_add=True)
-    end_date = models.DateTimeField()
+    end_date = models.DateTimeField(default=default_end_date) # Date and time when the auction for a specific listing ends
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Active')
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="auctions_owned", on_delete=models.CASCADE) #Relation to User Model, indicating the user who posted the listing
     winner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="auctions_won", null=True, on_delete=models.SET_NULL) # Relation to User Model, indicating the user who won the auction; default is null until the auction ends
@@ -30,11 +41,6 @@ class Auction(models.Model):
 
     def __str__(self):
         return self.title
-
-
-def validate_non_negative(value):
-    if value < 0:
-        raise ValidationError('Amount must be a non-negative value.')
 
 
 class Bid(models.Model):
