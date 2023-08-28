@@ -12,5 +12,5 @@ This project is an assignment from [Harvard's CS50 Web Programming with Python a
 
 ## Development Status
 
-🚧 **Please note: This project is currently under development.** We're working on adding more features and enhancements.
+🚧 **Please note: This project is currently under development.** I'm working on adding more features and enhancements.
 
