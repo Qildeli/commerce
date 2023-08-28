@@ -1,4 +1,16 @@
-# commerce
+# Commerce: An eBay-like Auction Site
 
 ## Overview
-This project is an eBay-like e-commerce auction site that will allow users to post auction listings, place bids on listings, comment on those listings, and add listings to a “watchlist”. It's a part of [Harvard's CS50 Web Programming with Python and JavaScript course.](https://cs50.harvard.edu/web/2020/projects/2/)
+**Commerce** is an e-commerce auction platform inspired by eBay. This web application offers the following features:
+
+- **Post Auction Listings:** Users can easily list items they wish to auction.
+- **Place Bids:** Engage in competitive bidding for items of interest.
+- **Comment on Listings:** Engage in discussions or ask questions related to the auction item.
+- **Add to Watchlist:** Track items of interest by adding them to your watchlist.
+
+This project is an assignment from [Harvard's CS50 Web Programming with Python and JavaScript course](https://cs50.harvard.edu/web/2020/projects/2/).
+
+## Development Status
+
+🚧 **Please note: This project is currently under development.** We're working on adding more features and enhancements.
+
