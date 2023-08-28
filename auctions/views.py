@@ -5,12 +5,20 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
-from .models import User
+from .models import User, Auction
 from .forms import CreateListingForm
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    # Query for active listings
+    listings = Auction.objects.filter(status="Active")
+
+    # Pass the listings to the template
+    context = {
+        'listings': listings
+    }
+
+    return render(request, "auctions/index.html", context)
 
 
 def login_view(request):
@@ -81,3 +89,4 @@ def create_listing(request):
     return render(request, "auctions/create_listing.html", {
         "form": form
     })
+
