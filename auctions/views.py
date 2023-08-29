@@ -6,8 +6,8 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
-from .models import User, Auction, Bid
-from .forms import CreateListingForm, BidForm
+from .models import User, Auction, Bid, Comment
+from .forms import CreateListingForm, BidForm, CommentForm
 
 
 def index(request):
@@ -94,29 +94,41 @@ def create_listing(request):
 
 def listing_page(request, listing_id):
     listing = get_object_or_404(Auction, id=listing_id)
-    form = BidForm()
+    comments = Comment.objects.filter(listing=listing)
+    bid_form = BidForm()
+    comment_form = CommentForm()
 
     if request.method == 'POST':
-        form = BidForm(request.POST)
-        if form.is_valid():
-            amount = form.cleaned_data['amount']
+        if 'place_bid' in request.POST:
+            bid_form = BidForm(request.POST)
+            if bid_form.is_valid():
+                amount = bid_form.cleaned_data['amount']
 
-            # Check for negative bid amount
-            if amount < 0:
-                messages.error(request, 'Bid amount cannot be negative.')
-                return redirect('listing_page', listing_id=listing_id)  # Redirect back to the listing page
+                # Check for negative bid amount
+                if amount < 0:
+                    messages.error(request, 'Bid amount cannot be negative.')
+                    return redirect('listing_page', listing_id=listing_id)  # Redirect back to the listing page
 
-            if amount <= listing.current_price:
-                messages.error(request, 'Your bid must be higher than the current price.')
-            else:
-                new_bid = Bid.objects.create(amount=amount, user=request.user, listing=listing)
-                listing.current_price = amount
-                listing.save()
-                messages.success(request, 'Successfully placed your bid.')
+                if amount <= listing.current_price:
+                    messages.error(request, 'Your bid must be higher than the current price.')
+                else:
+                    new_bid = Bid.objects.create(amount=amount, user=request.user, listing=listing)
+                    listing.current_price = amount
+                    listing.save()
+                    messages.success(request, 'Successfully placed your bid.')
+        elif 'add_comment' in request.POST:
+            comment_form = CommentForm(request.POST)
+            if comment_form.is_valid():
+                new_comment = comment_form.save(commit=False)
+                new_comment.user = request.user
+                new_comment.listing = listing
+                new_comment.save()
 
     context = {
         'listing': listing,
-        'form': form,  # Add the form to the context
+        'comments': comments,
+        'bid_form': bid_form,
+        'comment_form': comment_form
     }
     return render(request, 'auctions/listing_page.html', context)
 
@@ -129,3 +141,29 @@ def toggle_watchlist(request, auction_id):
         auction.watchlist_users.add(request.user)
     auction.save()
     return redirect('listing_page', listing_id=auction.id)
+
+
+def close_auction(request, listing_id):
+    listing = get_object_or_404(Auction, id=listing_id)
+
+    # Check if the logged-in user is the owner of the listing
+    if request.user != listing.owner:
+        messages.error(request, 'You do not have permission to close this auction.')
+        return redirect('listing_page', listing_id=listing.id)
+
+    # Check if the auction is already closed
+    if listing.status != 'Active':
+        messages.error(request, 'This auction is already closed.')
+        return redirect('listing_page', listing_id=listing.id)
+
+    # Close the auction
+    listing.status = 'Ended'
+
+    # Find the highest bid and set the winner
+    highest_bid = listing.bids_on_item.order_by('-amount').first()
+    if highest_bid:
+        listing.winner = highest_bid.user
+
+    listing.save()
+    messages.success(request, 'Auction closed successfully.')
+    return redirect('listing_page', listing_id=listing.id)

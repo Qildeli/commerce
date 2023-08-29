@@ -14,6 +14,7 @@ urlpatterns = [
     path("create", views.create_listing, name="create_listing"),
     path('listing/<int:listing_id>/', views.listing_page, name='listing_page'),
     path('toggle_watchlist/<int:auction_id>/', views.toggle_watchlist, name='toggle_watchlist'),
+    path('close_auction/<int:listing_id>/', views.close_auction, name='close_auction')
 ]
 
 if settings.DEBUG:

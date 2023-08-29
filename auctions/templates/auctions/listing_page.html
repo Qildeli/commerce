@@ -9,12 +9,15 @@
     <p>End Date: {{ listing.end_date }}</p>
     <p>Status: {{ listing.status }}</p>
     <p>Posted by: {{ listing.owner.username }}</p>
+
     {% if listing.winner %}
         <p>Winner: {{ listing.winner.username }}</p>
     {% endif %}
+
     {% if listing.category %}
         <p>Category: {{ listing.category.name }}</p>
     {% endif %}
+
     {% if listing.image_url %}
         <img src="{{ listing.image_url.url }}" alt="{{ listing.title }}">
     {% endif %}
@@ -31,13 +34,45 @@
             </button>
         </form>
 
-        <!-- Add a new form for bidding -->
+        <!-- Bidding Form -->
         <h3>Place a bid</h3>
         <form action="{% url 'listing_page' listing.id %}" method="post">
             {% csrf_token %}
-            {{ form }}
-            <button type="submit">Place Bid</button>
+            {{ bid_form }}
+            <button type="submit" name="place_bid">Place Bid</button>
         </form>
     {% endif %}
+
+    <!-- Close Auction -->
+    {% if user.is_authenticated and user == listing.owner and listing.status == 'Active' %}
+        <form action="{% url 'close_auction' listing.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Close Auction</button>
+        </form>
+    {% endif %}
+
+    <!-- Winning Message -->
+    {% if listing.status == 'Ended' and user == listing.winner %}
+        <p>Congratulations, you won this auction!</p>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        <!-- Commenting Form -->
+        <h3>Add a Comment</h3>
+        <form action="{% url 'listing_page' listing.id %}" method="post">
+            {% csrf_token %}
+            {{ comment_form }}
+            <button type="submit" name="add_comment">Add Comment</button>
+        </form>
+    {% endif %}
+
+    <!-- Display Comments -->
+    <h3>Comments</h3>
+    {% for comment in comments %}
+        <div>
+            <strong>{{ comment.user.username }}</strong> ({{ comment.date_posted }})
+            <p>{{ comment.content }}</p>
+        </div>
+    {% endfor %}
 
 {% endblock %}
