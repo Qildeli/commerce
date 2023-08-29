@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
@@ -90,3 +90,20 @@ def create_listing(request):
         "form": form
     })
 
+
+def listing_page(request, listing_id):
+    listing = get_object_or_404(Auction, id=listing_id)
+    context = {
+        'listing': listing,
+    }
+    return render(request, 'auctions/listing_page.html', context)
+
+
+def toggle_watchlist(request, auction_id):
+    auction = get_object_or_404(Auction, id=auction_id)
+    if request.user in auction.watchlist_users.all():
+        auction.watchlist_users.remove(request.user)
+    else:
+        auction.watchlist_users.add(request.user)
+    auction.save()
+    return redirect('listing_page', listing_id=auction.id)

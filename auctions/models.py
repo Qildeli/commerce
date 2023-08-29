@@ -38,6 +38,7 @@ class Auction(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="auctions_owned", on_delete=models.CASCADE) #Relation to User Model, indicating the user who posted the listing
     winner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="auctions_won", null=True, on_delete=models.SET_NULL) # Relation to User Model, indicating the user who won the auction; default is null until the auction ends
     category = models.ForeignKey('Category', related_name="listings", null=True, blank=True, on_delete=models.SET_NULL)
+    watchlist_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='watchlist', blank=True)
 
     def __str__(self):
         return self.title

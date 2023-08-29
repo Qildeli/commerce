@@ -1,0 +1,35 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>{{ listing.title }}</h2>
+    <p>{{ listing.description }}</p>
+    <p>Starting Price: ${{ listing.start_price }}</p>
+    <p>Current Price: ${{ listing.current_price }}</p>
+    <p>Start Date: {{ listing.start_date }}</p>
+    <p>End Date: {{ listing.end_date }}</p>
+    <p>Status: {{ listing.status }}</p>
+    <p>Posted by: {{ listing.owner.username }}</p>
+    {% if listing.winner %}
+        <p>Winner: {{ listing.winner.username }}</p>
+    {% endif %}
+    {% if listing.category %}
+        <p>Category: {{ listing.category.name }}</p>
+    {% endif %}
+    {% if listing.image_url %}
+        <img src="{{ listing.image_url.url }}" alt="{{ listing.title }}">
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        <form action="{% url 'toggle_watchlist' listing.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit">
+                {% if user in listing.watchlist_users.all %}
+                    Remove from Watchlist
+                {% else %}
+                    Add to Watchlist
+                {% endif %}
+            </button>
+        </form>
+    {% endif %}
+
+{% endblock %}
