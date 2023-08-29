@@ -30,6 +30,14 @@
                 {% endif %}
             </button>
         </form>
+
+        <!-- Add a new form for bidding -->
+        <h3>Place a bid</h3>
+        <form action="{% url 'listing_page' listing.id %}" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <button type="submit">Place Bid</button>
+        </form>
     {% endif %}
 
 {% endblock %}

@@ -4,9 +4,10 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
-from .models import User, Auction
-from .forms import CreateListingForm
+from .models import User, Auction, Bid
+from .forms import CreateListingForm, BidForm
 
 
 def index(request):
@@ -93,8 +94,29 @@ def create_listing(request):
 
 def listing_page(request, listing_id):
     listing = get_object_or_404(Auction, id=listing_id)
+    form = BidForm()
+
+    if request.method == 'POST':
+        form = BidForm(request.POST)
+        if form.is_valid():
+            amount = form.cleaned_data['amount']
+
+            # Check for negative bid amount
+            if amount < 0:
+                messages.error(request, 'Bid amount cannot be negative.')
+                return redirect('listing_page', listing_id=listing_id)  # Redirect back to the listing page
+
+            if amount <= listing.current_price:
+                messages.error(request, 'Your bid must be higher than the current price.')
+            else:
+                new_bid = Bid.objects.create(amount=amount, user=request.user, listing=listing)
+                listing.current_price = amount
+                listing.save()
+                messages.success(request, 'Successfully placed your bid.')
+
     context = {
         'listing': listing,
+        'form': form,  # Add the form to the context
     }
     return render(request, 'auctions/listing_page.html', context)
 
