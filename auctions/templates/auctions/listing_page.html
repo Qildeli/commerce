@@ -22,15 +22,15 @@
         <img src="{{ listing.image_url.url }}" alt="{{ listing.title }}">
     {% endif %}
 
-    {% if user.is_authenticated %}
+        {% if user.is_authenticated %}
         <form action="{% url 'toggle_watchlist' listing.id %}" method="post">
             {% csrf_token %}
             <button type="submit">
-                {% if user in listing.watchlist_users.all %}
-                    Remove from Watchlist
-                {% else %}
-                    Add to Watchlist
-                {% endif %}
+            {% if is_in_watchlist %}
+                Remove from Watchlist
+            {% else %}
+                Add to Watchlist
+            {% endif %}
             </button>
         </form>
 

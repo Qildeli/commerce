@@ -134,12 +134,20 @@ def listing_page(request, listing_id):
 
 
 def toggle_watchlist(request, auction_id):
+    """
+    Toggles an auction item's presence in the user's watchlist.
+    Adds the item if it's not already in the watchlist; removes it otherwise.
+    """
     auction = get_object_or_404(Auction, id=auction_id)
-    if request.user in auction.watchlist_users.all():
-        auction.watchlist_users.remove(request.user)
+    watchlist_item, created = Watchlist.objects.get_or_create(user=request.user, listing=auction)
+
+    if created:
+        # Item added to watchlist
+        pass
     else:
-        auction.watchlist_users.add(request.user)
-    auction.save()
+        # Item was already in the watchlist, so we remove it
+        watchlist_item.delete()
+
     return redirect('listing_page', listing_id=auction.id)
 
 
