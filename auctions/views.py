@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
-from .models import User, Auction, Bid, Comment
+from .models import User, Auction, Bid, Comment, Watchlist, Category
 from .forms import CreateListingForm, BidForm, CommentForm
 
 
@@ -167,3 +167,26 @@ def close_auction(request, listing_id):
     listing.save()
     messages.success(request, 'Auction closed successfully.')
     return redirect('listing_page', listing_id=listing.id)
+
+
+@login_required
+def watchlist(request):
+    watchlist_items = Watchlist.objects.filter(user=request.user)
+
+    context = {
+        'watchlist_items': watchlist_items,
+    }
+
+    return render(request, 'auctions/watchlist.html', context)
+
+
+def all_categories(request):
+    categories = Category.objects.all()
+    return render(request, 'auctions/all_categories.html', {'categories': categories})
+
+def category_listings(request, category_id):
+    category = get_object_or_404(Category, id=category_id)
+    listings = Auction.objects.filter(category=category, status='Active')
+    return render(request, 'auctions/category_listings.html', {'listings': listings, 'category': category})
+
+

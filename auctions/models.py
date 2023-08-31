@@ -69,6 +69,9 @@ class Watchlist(models.Model):
     listing = models.ForeignKey(Auction, related_name="watched_by", on_delete=models.CASCADE)
     added_on = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.user.username} has added {self.listing.title} on {self.added_on}"
+
 
 class Category(models.Model):
     name = models.CharField(max_length=255)

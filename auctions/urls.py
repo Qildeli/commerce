@@ -14,7 +14,10 @@ urlpatterns = [
     path("create", views.create_listing, name="create_listing"),
     path('listing/<int:listing_id>/', views.listing_page, name='listing_page'),
     path('toggle_watchlist/<int:auction_id>/', views.toggle_watchlist, name='toggle_watchlist'),
-    path('close_auction/<int:listing_id>/', views.close_auction, name='close_auction')
+    path('close_auction/<int:listing_id>/', views.close_auction, name='close_auction'),
+    path('watchlist/', views.watchlist, name='watchlist'),
+    path('categories/', views.all_categories, name='all_categories'),
+    path('category/<int:category_id>/', views.category_listings, name='category_listings')
 ]
 
 if settings.DEBUG:
