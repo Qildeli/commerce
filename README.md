@@ -10,7 +10,42 @@
 
 This project is an assignment from [Harvard's CS50 Web Programming with Python and JavaScript course](https://cs50.harvard.edu/web/2020/projects/2/).
 
-## Development Status
+## Setup
+1. **Clone this repository**
 
-🚧 **Please note: This project is currently under development.** I'm working on adding more features and enhancements.
+    ```bash
+    git clone https://github.com/qildeli/commerce.git
+    ```
 
+2. **Navigate into the repository's directory**
+
+    ```bash
+    cd commerce
+    ```
+
+3. **Create a virtual environment** (optional)
+
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+    ```
+
+4. **Install dependencies**
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+5. **Run migrations**
+
+    ```bash
+    python manage.py makemigrations
+    python manage.py migrate
+    ```
+
+6. **Run the application**
+
+    ```bash
+    python manage.py runserver
+    ```
+Open your web browser and navigate to http://127.0.0.1:8000/ to dive into Commerce.
